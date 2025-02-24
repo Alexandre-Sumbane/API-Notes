@@ -1,8 +1,15 @@
+const knex = require("../database/db");
+
 class TagsController {
-    async create( req, res) {
+    async index( req, res) {
         try {
-            const {email, password} = req.body;
-            return res.status(201).json({ email, password}); 
+             const { user_id } = req.params;
+
+             const tags = await knex("tags")
+             .where({ user_id });
+
+             return res.json(tags);
+             
         } catch (error) {
             console.log(`Erro: ${error}`)
         }
