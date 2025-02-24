@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 class UsersController {
     async create( req, res) {
         try {
