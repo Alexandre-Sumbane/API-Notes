@@ -1,11 +1,13 @@
-const express = require("express");
+import express from "express";
 
 const app = express();
 
-//const rotas = require("./src/routes/index");
 
 app.use(express.json());
-//app.use(rotas);
+
+import usersRouter from "./src/routes/usersRoutes.js";
+
+app.use("/register", usersRouter);
 
 
 app.listen(3000, (req, res)=>{
