@@ -20,19 +20,17 @@ class NotesController {
     }
   }
 
-  // async show(req, res) {
-  //   const { id } = req.params;
+  async show(req, res) {
+    const { id } = req.params;
 
-  //   const note = await knex("notes").where({ id }).first();
-  //   const tags = await knex("tags").where({ note_id: id }).orderBy("name");
-  //   const links = await knex("links").where({note_id: id}).orderBy("created_at");
+    const note = await Note.findByPk(id)
 
-  //   return res.json({
-  //       ...note,
-  //       tags,
-  //       links
-  //   });
-  // }
+    return res.json({
+        ...note,
+        tags,
+        links
+    });
+  }
 
   // async delete(req, res) {
   //   try {

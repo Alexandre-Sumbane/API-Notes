@@ -8,7 +8,7 @@ app.use(express.json());
 import usersRouter from "./src/routes/usersRoutes.js";
 import notesRouter from "./src/routes/notes.routes.js";
 
-app.use("/register", usersRouter);
+app.use("/users", usersRouter);
 app.use("/notes", notesRouter)
 
 
