@@ -14,9 +14,35 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING,
+    firstName: {
+      type: DataTypes.STRING,
+      validate: {
+        len: {
+          args: [4, 200],
+          msg: 'O nome deve ter pelo menos 4 caracteres',
+        },
+      },
+    },
+    lastName: {
+      type: DataTypes.STRING,
+        validate: {
+          len: {
+            args: [4, 200],
+            msg: 'O Sobrenome deve ter pelo menos 4 caracteres',
+          },
+        },
+    },
+    email: {
+      type: DataTypes.STRING,
+        unique: {
+          msg: 'Email já está cadastrado',
+        },
+        validate: {
+          isEmail: {
+            msg: 'Email inválido',
+          },
+        },
+    },
     password: DataTypes.STRING
   }, {
     sequelize,
