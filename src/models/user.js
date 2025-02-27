@@ -1,52 +1,75 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
-  }
-  User.init({
-    firstName: {
-      type: DataTypes.STRING,
-      validate: {
-        len: {
-          args: [4, 200],
-          msg: 'O nome deve ter pelo menos 4 caracteres',
+import Sequelize, { Model } from "sequelize";
+import bcryptjs from "bcrypt";
+
+export default class User extends Model {
+  static init(sequelize) {
+    super.init(
+      {
+        first_name: {
+          type: Sequelize.STRING,
+          allowNull: false,
+          validate: {
+            len: {
+              args: [4, 200],
+              msg: "O nome deve ter pelo menos 4 caracteres",
+            },
+          }
+        },
+        last_name: {
+          type: Sequelize.STRING,
+          allowNull: false,
+          validate: {
+            len: {
+              args: [4, 200],
+              msg: "O sobrenome deve ter pelo menos 4 caracteres",
+            },
+          }
+        },
+        email: {
+          type: Sequelize.STRING,
+          allowNull: false,
+          unique: {
+            msg: "Email já está cadastrado",
+          },
+          validate: {
+            isEmail: {
+              msg: "Email inválido",
+            },
+          },
+        },
+        password_hash: {
+          type: Sequelize.STRING,
+        },
+        password: {
+          type: Sequelize.VIRTUAL,
+          defaultValue: "",
+          validate: {
+            len: {
+              args: [6, 50],
+              msg: "A senha deve ter entre 6 e 50 caracteres",
+            },
+          },
         },
       },
-    },
-    lastName: {
-      type: DataTypes.STRING,
-        validate: {
-          len: {
-            args: [4, 200],
-            msg: 'O Sobrenome deve ter pelo menos 4 caracteres',
-          },
-        },
-    },
-    email: {
-      type: DataTypes.STRING,
-        unique: {
-          msg: 'Email já está cadastrado',
-        },
-        validate: {
-          isEmail: {
-            msg: 'Email inválido',
-          },
-        },
-    },
-    password: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'User',
-  });
-  return User;
-};
+      {
+        sequelize,
+      }
+    );
+
+    this.addHook("beforeSave", async (user) => {
+      if (user.password) {
+        user.password_hash = await bcryptjs.hash(user.password, 8);
+      }
+    });
+
+    return this;
+  }
+
+  static associate(models) {
+    // Definir associações aqui, se necessário
+  }
+
+  passwordIsValid(password) {
+    return bcryptjs.compare(password, this.password_hash); // Corrigido `passord_hash` → `password_hash`
+  }
+}

@@ -1,19 +1,21 @@
 import bcrypt from "bcrypt";
-import { User } from "../models";
-import note from "../models/note";
+import User  from "../models/user";
 
 class UsersController {
     async store(req, res) {
         try {
 
-            const { firstName, lastName, email, password } = req.body;
-
-            const hashedPassword = await bcrypt.hash(password, 10);
-
-            const newUser = await User.create({ firstName, lastName, email, password: hashedPassword });
+           const newUser = await User.create(req.body)
 
 
-            return res.json({newUser});
+            const { id, first_name, email } = newUser;
+
+
+            return res.json({
+              id,
+              first_name,
+              email
+            });
 
         } catch (e) {
             console.log(e);
@@ -23,7 +25,7 @@ class UsersController {
 
     async index(req, res){
       try {
-        const allUsers = await User.findAll( { attributes: { exclude: ['password'] } });
+        const allUsers = await User.findAll( { attributes: { exclude: ['password_hash'] } });
 
         return res.status(200).json(allUsers);
       } catch (e) {
@@ -35,7 +37,7 @@ class UsersController {
       try {
         const { id } = req.params;
 
-        const userShow = await User.findByPk(id,  { attributes: { exclude: ['password'] } });
+        const userShow = await User.findByPk(id,  { attributes: { exclude: ['password_hash'] } });
 
         if(!userShow) {
           return res.status(404).json( 'Usuario não encontrado' );
@@ -51,7 +53,7 @@ class UsersController {
       try {
         const { id } = req.params;
         console.log("ID recebido:", id);
-        const { firstName, lastName, email, password } = req.body;
+        const { first_name, last_name, email } = req.body;
 
         const user = await User.findByPk(id);
 
@@ -59,7 +61,7 @@ class UsersController {
           return res.status(404).json({ error: 'Usuário não encontrado' });
         }
 
-        await user.update({ firstName, lastName, email, password });
+        await user.update({ first_name, last_name, email, password });
 
         return res.json(user);
       } catch (e) {
@@ -70,7 +72,6 @@ class UsersController {
     async delete(req, res) {
       try {
         const { id } = req.params;
-        const { firstName, lastName, email, password } = req.body;
 
         const user = await User.findByPk(id);
 
